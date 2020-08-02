@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df50162c33ab1ac46b90f913bae3f770, type: 3}
+  m_Name: BasicTowerStats
+  m_EditorClassIdentifier: 
+  towerName: Basic Tower
+  prefabName: 3
+  initialRange: 10
+  initialAttackSpeed: 1
+  initialProjectileSpeed: 30
+  initialDamage: 2.5
+  initialRotationSpeed: 50
+  initialPrice: 25
+  initialSellPricePenalty: 15
+  levelUps:
+  - upgradePrice: 10
+    range: 2
+    attackSpeed: -0.2
+    projectileSpeed: 10
+    damage: 2
+    rotationSpeed: 15
+    towerPrice: 10
+  - upgradePrice: 20
+    range: 2
+    attackSpeed: -0.2
+    projectileSpeed: 10
+    damage: 2
+    rotationSpeed: 15
+    towerPrice: 10
+  - upgradePrice: 30
+    range: 2
+    attackSpeed: 0
+    projectileSpeed: 10
+    damage: 2
+    rotationSpeed: 15
+    towerPrice: 10

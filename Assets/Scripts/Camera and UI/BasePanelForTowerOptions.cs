@@ -45,6 +45,7 @@ namespace Camera_and_UI
 
         public abstract void ShowMenu(TowerSpawner towerSpawner);
         public abstract void ClosePanel();
+        public abstract void SwitchPanel(TowerSpawner towerSpawner = null);
     }
 
 

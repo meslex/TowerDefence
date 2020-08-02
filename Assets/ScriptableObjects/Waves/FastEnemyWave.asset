@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6af0ef320ca50b44ea5c5ecd15837f67, type: 3}
+  m_Name: FastEnemyWave
+  m_EditorClassIdentifier: 
+  boss: 0
+  enemy: {fileID: 9053542393390182161, guid: 68a59979228f9104a8edf6709ca45789, type: 3}
+  initialWaveSize: 15
+  initialspawnRate: 1.8
+  upgradeRate: 3
+  maxWaveSize: 20
+  minSpawnRate: 0.5
+  waveSizeIncrement: 2
+  spawnRateDecrement: 0.2

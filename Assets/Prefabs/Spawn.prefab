@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 7345793626999105712}
   - component: {fileID: 7345793626999105679}
   - component: {fileID: 7345793626999105678}
-  - component: {fileID: 7345793626999105677}
   - component: {fileID: 7345793626999105713}
+  - component: {fileID: 1727191065}
   m_Layer: 0
   m_Name: Spawn
   m_TagString: Untagged
@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 7345793626999105676}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 25.53, y: 2.44, z: -31.82}
-  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_LocalScale: {x: 5, y: 5, z: 5.25}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -81,19 +81,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!65 &7345793626999105677
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7345793626999105676}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &7345793626999105713
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -106,29 +93,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6b744484a0f8564bb943fc7bd6c40c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  waves:
-  - enemy: {fileID: 5136705861658142301, guid: 708a83ff698b9704084ee87b64ed9f51, type: 3}
-    waveSize: 10
-    spawnRate: 2
-    maxWaveSize: 50
-    minSpawnRate: 0.2
-    waveSizeIncrement: 2
-    spawnRateDecrement: 0.2
-  - enemy: {fileID: 6044699627496721244, guid: 0696caf582654834483b686ceaa914e3, type: 3}
-    waveSize: 10
-    spawnRate: 2
-    maxWaveSize: 50
-    minSpawnRate: 0.2
-    waveSizeIncrement: 2
-    spawnRateDecrement: 0.2
-  - enemy: {fileID: 9053542393390182160, guid: 68a59979228f9104a8edf6709ca45789, type: 3}
-    waveSize: 10
-    spawnRate: 2
-    maxWaveSize: 50
-    minSpawnRate: 0.2
-    waveSizeIncrement: 2
-    spawnRateDecrement: 0.2
-  wavesDelay: 15
+  wavesDelay: 10
   wavesDelayDecrement: 2
   minWavesDelay: 5
   start: {fileID: 0}
+--- !u!114 &1727191065
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7345793626999105676}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 041e6ee88208cff4a8548dbd4d2d2ed2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  regularWaves:
+  - {fileID: 11400000, guid: d001fa34f2c926b439a9945202ccdad5, type: 2}
+  - {fileID: 11400000, guid: f238000e995a288489037f466a708056, type: 2}
+  - {fileID: 11400000, guid: d3c2678e53bef0446897339f146523b7, type: 2}
+  bossWaves:
+  - {fileID: 11400000, guid: 8f1a4cdba4950ea45b0383f4c7b75e1a, type: 2}
+  wavesPackSize: 4

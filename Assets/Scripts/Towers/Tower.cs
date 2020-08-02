@@ -8,14 +8,13 @@ using Towers.Projectiles;
 using UnityEngine;
 using UnityEngine.UI;
 
-
-
 //Change attack speed calculation it doesnt make sense at the moment
 namespace Towers
 {
    
     public enum TargetingOptions
     {
+        First,
         Closest,
         Farthest,
         Weakest,
@@ -34,9 +33,9 @@ namespace Towers
             LookingForTargets
         }
 
-        #region protected properties
+        #region Protected properties
         protected TowerState currentState;
-        protected Enemy currentTarget;
+        protected BaseEnemy currentTarget;
         protected float nextAttack;
 
         protected int level;
@@ -48,17 +47,24 @@ namespace Towers
         protected float currentPrice;
         protected float currentSellPricePenalty;
 
+        private Collider[] hitColliders;
+
+        //[SerializeField] protected PrefabName towerName;
         [SerializeField] protected LayerMask enemyLayer;
+
         [SerializeField] protected TargetingOptions targetingType;
         [SerializeField] protected TowerStats stats;
         [SerializeField] protected GameObject pivotPoint;
-        [SerializeField] protected GameObject muzzle;
-        [SerializeField] protected GameObject projectile;
+        [SerializeField] protected BaseProjectile projectile;
+        [SerializeField] protected Transform muzzle;
+
 
         #endregion
 
         #region Public properties
-
+        /// <summary>
+        /// Returns whether tower can upgrade
+        /// </summary>
         public bool CanUpgrade
         {
             get
@@ -67,20 +73,32 @@ namespace Towers
             }
         }
 
+        /// <summary>
+        /// Returns tower stats
+        /// </summary>
         public TowerStats Stats { get { return stats; } }
 
+        /// <summary>
+        /// Returns tower target priority: closest/farthest etc.
+        /// </summary>
         public TargetingOptions TargetPriority
         {
             get { return targetingType; }
             set { targetingType = value; }
         }
 
+        /// <summary>
+        /// Returns current tower target 
+        /// </summary>
         public int Level
         {
             get { return level; }
             set { level = value; }
         }
 
+        /// <summary>
+        /// Returns price for next tower upgrade 
+        /// </summary>
         public float UpgradePrice
         {
             get
@@ -92,44 +110,68 @@ namespace Towers
             }
         }
 
+        /// <summary>
+        /// Returns current tower's range 
+        /// </summary>
         public float Range
         {
             get { return currentRange; }
             set { currentRange = value; }
         }
 
+        /// <summary>
+        /// Returns doubled range
+        /// </summary>
         public float DoubledRange { get { return currentRange * 2; } }
 
+        /// <summary>
+        /// Return current attack speed
+        /// </summary>
         public float AttackSpeed
         {
             get { return currentAttackSpeed; }
             set { currentAttackSpeed = value; }
         }
 
+        /// <summary>
+        /// Return current projectile speed
+        /// </summary>
         public float ProjectileSpeed
         {
             get { return currentProjectileSpeed; }
             set { currentProjectileSpeed = value; }
         }
 
+        /// <summary>
+        /// Return current Damage
+        /// </summary>
         public float Damage
         {
             get { return currentDamage; }
             set { currentDamage = value; }
         }
 
+        /// <summary>
+        /// Return current tower's rotation speed
+        /// </summary>
         public float RotationSpeed
         {
             get { return currentRotationSpeed; }
             set { currentRotationSpeed = value; }
         }
 
+        /// <summary>
+        /// Return current tower's price
+        /// </summary>
         public float Price
         {
             get { return currentPrice; }
             set { currentPrice = value; }
         }
 
+        /// <summary>
+        /// Returns amount that will be subtracted from value of tower after it was bought
+        /// </summary>
         public float SellPricePenalty
         {
             get { return currentSellPricePenalty; }
@@ -139,14 +181,12 @@ namespace Towers
 
         protected virtual void OnEnable()
         {
-            if (stats.TowerTag != gameObject.tag)
-                Debug.LogError($"[Tower] tag from tower stats:{stats.TowerTag} " +
-                    $"doesn't match with tower gameobject tag: {gameObject.tag}");
+            currentState = TowerState.LookingForTargets;
 
             Init();
         }
 
-        private void OnDisable()
+        protected virtual void OnDisable()
         {
             ResetTowerStats();
 
@@ -162,6 +202,20 @@ namespace Towers
             Init();
         }
 
+        /// <summary>
+        /// Initialises tower with values from scriptable object
+        /// </summary>
+        protected virtual void Init()
+        {
+            level = 0;
+            currentRange = stats.InitialRange;
+            currentAttackSpeed = stats.InitialAttackSpeed;
+            currentProjectileSpeed = stats.InitialProjectileSpeed;
+            currentDamage = stats.InitialDamage;
+            currentRotationSpeed = stats.InitialRotationSpeed;
+            currentPrice = stats.InitialPrice - stats.InitialSellPricePenalty;
+            currentSellPricePenalty = stats.InitialSellPricePenalty;
+        }
 
         void Update()
         {
@@ -199,7 +253,123 @@ namespace Towers
         }
 
         protected abstract void Attack();
-        protected abstract bool LookForTargets();
+
+        protected virtual bool LookForTargets()
+        {
+            hitColliders = Physics.OverlapSphere(transform.position, Range, enemyLayer);
+            if (hitColliders.Length == 1)
+            {
+                currentTarget = hitColliders[0].gameObject.GetComponent<BaseEnemy>();
+
+                if (currentTarget != null && !currentTarget.IsDead)
+                {
+
+                    return true;
+                }
+
+            }
+            else if (hitColliders.Length >= 1)
+            {
+                int offset = 0;
+                currentTarget = hitColliders[offset].GetComponent<BaseEnemy>();
+
+                do
+                {
+                    currentTarget = hitColliders[offset].GetComponent<BaseEnemy>();
+                    offset++;
+                } while (currentTarget == null);
+
+                BaseEnemy target;
+                float currentDistance = Vector3.SqrMagnitude(muzzle.transform.position - currentTarget.Position);
+
+                switch (targetingType)
+                {
+                    case TargetingOptions.First:
+
+                        currentTarget = hitColliders[0].GetComponent<BaseEnemy>();
+
+                        for (int i = offset; i < hitColliders.Length; ++i)
+                        {
+                            target = hitColliders[i].GetComponent<BaseEnemy>();
+                            if (target != null && !target.IsDead && target.Movement.WaypointsSwitched > currentTarget.Movement.WaypointsSwitched)
+                            {
+                                currentTarget = target;
+
+                            }
+                        }
+                        break;
+
+                    case TargetingOptions.Closest:
+
+                        for (int i = offset; i < hitColliders.Length; ++i)
+                        {
+                            target = hitColliders[i].GetComponent<BaseEnemy>();
+
+                            float newDistance = Vector3.SqrMagnitude(muzzle.transform.position - target.transform.position);
+
+                            if (target != null && !target.IsDead && newDistance < currentDistance)
+                            {
+                                currentTarget = target;
+                                currentDistance = newDistance;
+                            }
+                        }
+                        break;
+
+                    case TargetingOptions.Farthest:
+                        currentTarget = hitColliders[0].GetComponent<BaseEnemy>();
+
+                        for (int i = offset; i < hitColliders.Length; ++i)
+                        {
+                            target = hitColliders[i].GetComponent<BaseEnemy>();
+                            float newDistance = Vector3.SqrMagnitude(muzzle.transform.position - target.transform.position);
+
+                            if (target != null && !target.IsDead && newDistance > currentDistance)
+                            {
+                                currentTarget = target;
+                                currentDistance = newDistance;
+                            }
+                        }
+                        break;
+
+                    case TargetingOptions.Strongest:
+                        currentTarget = hitColliders[0].GetComponent<BaseEnemy>();
+
+                        for (int i = offset; i < hitColliders.Length; ++i)
+                        {
+                            target = hitColliders[i].GetComponent<BaseEnemy>();
+                            if (target != null && !target.IsDead && target.Health > currentTarget.Health)
+                            {
+                                currentTarget = target;
+
+                            }
+                        }
+                        break;
+
+                    case TargetingOptions.Weakest:
+                        currentTarget = hitColliders[0].GetComponent<BaseEnemy>();
+                        for (int i = offset; i < hitColliders.Length; ++i)
+                        {
+                            target = hitColliders[i].GetComponent<BaseEnemy>();
+                            if (target != null && !target.IsDead && target.Health < currentTarget.Health)
+                            {
+                                currentTarget = target;
+
+                            }
+                        }
+                        break;
+
+                    case TargetingOptions.Random:
+                        break;
+                }
+
+                if (currentTarget != null && !currentTarget.IsDead)
+                    return true;
+                else
+                    return false;
+            }
+
+            return false;
+        }
 
         /// <summary>
         /// Upgrades tower
@@ -222,23 +392,18 @@ namespace Towers
             }
         }
 
-        /// <summary>
-        /// Initialises tower with values from scriptable object
-        /// </summary>
-        public void Init()
+        public virtual void Sell()
         {
-            level = 0;
-            currentRange = stats.InitialRange;
-            currentAttackSpeed = stats.InitialAttackSpeed;
-            currentProjectileSpeed = stats.InitialProjectileSpeed;
-            currentDamage = stats.InitialDamage;
-            currentRotationSpeed = stats.InitialRotationSpeed;
-            currentPrice = stats.InitialPrice - stats.InitialSellPricePenalty;
-            currentSellPricePenalty = stats.InitialSellPricePenalty;
+            MoneyContoller.Instance.AddMoney(Price);
+            gameObject.SetActive(false);
+            ObjectPooler.Instance.ReturnObjectToPool(gameObject);
         }
 
-
-        public abstract void Sell();
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(transform.position, Range);
+        }
     }
 
 }

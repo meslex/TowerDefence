@@ -12,8 +12,8 @@ using static Towers.Tower;
 [Serializable]
 public class Options
 {
-    public TowerStats towerStats;
-    public CustomButton button;
+    public Tower tower;
+    //public CustomButton button;
     public Text TowerName;
     public Text TowerPrice;
 }
@@ -21,9 +21,9 @@ public class Options
 
 public class TowerBuilderUIController : BasePanelForTowerOptions
 {
-    [SerializeField] private List<Options> options = new List<Options>();
+    [SerializeField] private List<BuyTowerButton> options = new List<BuyTowerButton>();
 
-
+    public event Action<TowerSpawner> OnTowerBuilded;
 
     private void OnEnable()
     {
@@ -31,21 +31,19 @@ public class TowerBuilderUIController : BasePanelForTowerOptions
         
     }
 
-    private void SetText()
-    {
-        options[0].TowerName.text = $"{options[0].towerStats.TowerName}";
-        options[0].TowerPrice.text = $"Tower price: {options[0].towerStats.InitialPrice}";
-    }
-
     private void Start()
     {
-        options[0].button.onClick.AddListener(FirstButtonPressed);
-        options[0].button.OnHighlighted.AddListener(FirstButtonHighlighted);
-        options[0].button.OnMouseExit.AddListener(FirstButtongRemoveHighlight);
+        for(int i = 0; i < options.Count; ++i)
+        {
+            options[i].OnClick += SpawnButtonPressed;
+            options[i].OnHighlighted += ButtonHighlighted;
+            options[i].OnMouseExit += ButtonRemoveHighlight;
+        }
 
         MoneyContoller.Instance.OnMoneyAmountChange += CheckPrices;
 
         targetingOptions.AddOptions(GetEnumValues(TargetingOptions.Closest));
+        CheckPrices(MoneyContoller.Instance.Money);
     }
 
     /// <summary>
@@ -57,38 +55,44 @@ public class TowerBuilderUIController : BasePanelForTowerOptions
         for(int i = 0; i < options.Count; ++i)
         {
             //if there is enough money to buy this tower make its button interactable
-            options[i].button.interactable = options[i].towerStats.InitialPrice <= currentMoney;
+            options[i].interactable = options[i].Tower.Stats.InitialPrice <= currentMoney;
         }
     }
 
     public override void ShowMenu(TowerSpawner towerSpawner)
     {
         Show();
+        targetingOptions.value = 0;
         currentSpawner = towerSpawner;
-        SetText();
     }
 
-    
-    public virtual void FirstButtonPressed()
+    public virtual void SpawnButtonPressed(Tower ts)
     {
-        TowerRangeController.Instance.HideRange();
-        currentSpawner.Spawn(options[0].towerStats, (TargetingOptions)targetingOptions.value);
-        Hide();
+        currentSpawner.Spawn(ts, (TargetingOptions)targetingOptions.value);
+        OnTowerBuilded?.Invoke(currentSpawner);
     }
 
-    public virtual void FirstButtonHighlighted()
+    public virtual void ButtonHighlighted(Tower ts)
     {
-        TowerRangeController.Instance.ShowRange(currentSpawner, options[0].towerStats);
+        if (IsVisible)
+            TowerRangeController.Instance.ShowRange(currentSpawner, ts);
     }
 
-    public virtual void FirstButtongRemoveHighlight()
+    public virtual void ButtonRemoveHighlight()
     {
-        TowerRangeController.Instance.HideRange();
+        if(IsVisible)
+            TowerRangeController.Instance.HideRange();
     }
 
     public override void ClosePanel()
     {
         TowerRangeController.Instance.HideRange();
+        currentSpawner = null;
+        Hide();
+    }
+
+    public override void SwitchPanel(TowerSpawner towerSpawner = null)
+    {
         currentSpawner = null;
         Hide();
     }

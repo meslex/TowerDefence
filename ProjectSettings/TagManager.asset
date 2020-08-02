@@ -4,11 +4,18 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Enemy
-  - Projectile
+  - Shootable
+  - MortarTower
+  - MultiBarrelTower
   - BasicTower
+  - MortarProjectile
+  - Projectile
   - BulkyEnemy
+  - BasicEnemy
   - FastEnemy
+  - FirstBoss
+  - Enemy
+  - SmallExplosion
   layers:
   - Default
   - TransparentFX
@@ -18,13 +25,13 @@ TagManager:
   - UI
   - 
   - 
+  - Lighting
+  - Ground
+  - Postprocessing
+  - Enemies
+  - Player
   - 
   - 
-  - 
-  - 
-  - Towers
-  - Enemy
-  - TowerSpawner
   - 
   - 
   - 
@@ -43,6 +50,9 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Fire
+    uniqueID: 3804908061
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0

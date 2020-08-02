@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df50162c33ab1ac46b90f913bae3f770, type: 3}
+  m_Name: MortarTowerStats
+  m_EditorClassIdentifier: 
+  towerName: Mortar
+  initialRange: 14
+  initialAttackSpeed: 4
+  initialProjectileSpeed: 25
+  initialDamage: 30
+  initialRotationSpeed: 50
+  initialPrice: 100
+  initialSellPricePenalty: 35
+  levelUps:
+  - upgradePrice: 100
+    range: 3
+    attackSpeed: -0.05
+    projectileSpeed: 0
+    damage: 10
+    rotationSpeed: 15
+    towerPrice: 100
+  - upgradePrice: 100
+    range: 3
+    attackSpeed: -0.05
+    projectileSpeed: 0
+    damage: 10
+    rotationSpeed: 15
+    towerPrice: 100
+  - upgradePrice: 100
+    range: 2
+    attackSpeed: -0.05
+    projectileSpeed: 0
+    damage: 10
+    rotationSpeed: 15
+    towerPrice: 100

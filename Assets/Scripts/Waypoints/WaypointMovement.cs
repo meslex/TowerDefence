@@ -7,6 +7,7 @@ using UnityEngine.UI;
 
 public class WaypointMovement : MonoBehaviour
 {
+    #region Fields
     public event Action ReachedDestination;
 
     [SerializeField] private Waypoint currentWaypoint = default;
@@ -17,20 +18,47 @@ public class WaypointMovement : MonoBehaviour
     [SerializeField] private float turnSmoothing = default;
 
     private Vector3 destination;
+    private Vector3 upVector;
+    //private Vector3 gravity = Vector3.down;
+
     private Vector3 currentVelocity;
     private bool moving;
     private float switchDistSqr { get { return switchDistance * switchDistance; } }
+    private Transform myTransform;
+    private Vector3 impulse;
+
+    public float Speed { get { return speed; } set{ speed = value; } }
+    public int WaypointsSwitched { get; private set; }
+    public bool IsMoving { get { return moving; } }
+    public Vector3 Velocity { get { return currentVelocity.normalized * speed; } }
+    #endregion
+
+    private void OnEnable()
+    {
+        WaypointsSwitched = 0;
+        //currentVelocity = transform.forward;
+    }
+
+    private void Start()
+    {
+        myTransform = transform;
+    }
 
     public void SetWaypoint(Waypoint waypoint)
     {
         currentWaypoint = waypoint;
         destination = currentWaypoint.GetPosition();
+        upVector = currentWaypoint.transform.up;
         moving = true;
     }
 
     public void StartMovement()
     {
-        moving = true;
+        if (currentWaypoint == null)
+            moving = false;
+        else
+            moving = true;
+        
     }
 
     public void Stop()
@@ -38,7 +66,7 @@ public class WaypointMovement : MonoBehaviour
         moving = false;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (moving)
         {
@@ -80,7 +108,9 @@ public class WaypointMovement : MonoBehaviour
         }
         else
         {
+            WaypointsSwitched++;
             destination = currentWaypoint.GetPosition();
+            upVector = currentWaypoint.transform.up;
         }
 
 
@@ -88,17 +118,47 @@ public class WaypointMovement : MonoBehaviour
 
     private void Move()
     {
-        Vector3 desiredVelocity = (destination - transform.position).normalized;
+        Vector3 desiredVelocity = (destination - myTransform.position).normalized;
+        Vector3 steering = (desiredVelocity - currentVelocity) * steeringForce * Time.fixedDeltaTime;
+
+        currentVelocity += steering ;
+
+        myTransform.position += currentVelocity.normalized * speed * Time.fixedDeltaTime;
+
+
+        myTransform.position += impulse /10;
+
+        impulse -= impulse / 10; 
+
+        Quaternion targetRotation = Quaternion.LookRotation(currentVelocity, upVector);
+
+        //float deltaAngle = Quaternion.Angle(targetRotation, myTransform.rotation);
+
+        myTransform.rotation = Quaternion.Lerp(myTransform.rotation, targetRotation, turnSmoothing * Time.fixedDeltaTime);
+        if(impulse.x < 0)
+            impulse = Vector3.zero;
+    }
+
+    /*private void Move()
+    {
+        Vector3 desiredVelocity = (destination - myTransform.position).normalized;
         Vector3 steering = (desiredVelocity - currentVelocity) * steeringForce * Time.deltaTime;
 
-        currentVelocity += steering;
+        currentVelocity += steering + impulse + Vector3.down;
 
-        transform.position += currentVelocity.normalized * speed * Time.deltaTime;
+        myTransform.position += currentVelocity.normalized * speed * Time.deltaTime;
 
-        Quaternion targetRotation = Quaternion.LookRotation(currentVelocity);
+        Quaternion targetRotation = Quaternion.LookRotation(currentVelocity, upVector);
 
-        float deltaAngle = Quaternion.Angle(targetRotation, transform.rotation);
+        //float deltaAngle = Quaternion.Angle(targetRotation, myTransform.rotation);
 
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, turnSmoothing);
+        myTransform.rotation = Quaternion.Lerp(myTransform.rotation, targetRotation, turnSmoothing * Time.deltaTime);
+        impulse = Vector3.zero;
+    }*/
+
+    public void AddImpulse(Vector3 impulse)
+    {
+        this.impulse = impulse;
+        //GetComponent<Rigidbody>().velocity = impulse;
     }
 }
