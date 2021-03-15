@@ -13,8 +13,6 @@ public class CameraMovement : MonoBehaviour
     public float movementTime;
     public float rotationAmount;
     public Vector3 zoomAmount;
-    public float maxZoom = 350;
-    public float minZoom = 10;
 
     private Vector3 dragStartPosition;
     private Vector3 dragCurrentPosition;
@@ -69,18 +67,7 @@ public class CameraMovement : MonoBehaviour
         //Zoom 
         if(Input.mouseScrollDelta.y != 0)
         {
-            //Zoom constraint
-            if(Input.mouseScrollDelta.y < 0)
-            {
-                if (newZoom.y >= maxZoom)
-                    return;
-            }
-            else
-                if (newZoom.y <= minZoom)
-                    return;
-
             newZoom += Input.mouseScrollDelta.y * zoomAmount;
-
         }
 
         //Move around level with mouse

@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 1178200290042178508}
   - component: {fileID: 1178200290042178507}
   - component: {fileID: 1178200290042178506}
-  - component: {fileID: 23580601}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -50,34 +49,27 @@ MonoBehaviour:
       type: 3}
     amountToPool: 50
     shouldExpand: 1
+    pooledObjects: []
   - objectToPool: {fileID: 5136705861658142301, guid: 708a83ff698b9704084ee87b64ed9f51,
       type: 3}
     amountToPool: 50
     shouldExpand: 1
+    pooledObjects: []
   - objectToPool: {fileID: 9053542393390182160, guid: 68a59979228f9104a8edf6709ca45789,
       type: 3}
     amountToPool: 50
     shouldExpand: 1
+    pooledObjects: []
   - objectToPool: {fileID: 8245544914394620869, guid: 70b0520d4b2d89244a59fa6efe3b08f4,
       type: 3}
-    amountToPool: 10
+    amountToPool: 6
     shouldExpand: 1
+    pooledObjects: []
   - objectToPool: {fileID: 6365061869648042499, guid: bb89fa3d550fe4740abfb9b0c732f93a,
       type: 3}
     amountToPool: 100
     shouldExpand: 1
-  - objectToPool: {fileID: 4626120670074481925, guid: 5220a79f4f6ec794fa9687fe754aa5eb,
-      type: 3}
-    amountToPool: 10
-    shouldExpand: 1
-  - objectToPool: {fileID: 4825837723005933300, guid: 3747289fe69921c43b142de7f0f0612c,
-      type: 3}
-    amountToPool: 10
-    shouldExpand: 1
-  - objectToPool: {fileID: 4560740698838048713, guid: 4b88e8d0e0de6694880ad7275ad5dc06,
-      type: 3}
-    amountToPool: 1
-    shouldExpand: 1
+    pooledObjects: []
 --- !u!114 &1178200290042178506
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -87,24 +79,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1178200290042178505}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 40adb78e304e50041afc52dcd0a4f179, type: 3}
+  m_Script: {fileID: 11500000, guid: 3f948e79c09f82e4ca59a5f8ccd6b24e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   towerSpawnersLayer:
     serializedVersion: 2
     m_Bits: 16384
---- !u!114 &23580601
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1178200290042178505}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0560cf7490a1b834f8f0e86ded7a11c4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  spawners:
-  - {fileID: 0}
-  startWaveButton: {fileID: 0}

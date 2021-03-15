@@ -13,7 +13,7 @@ namespace MoneyHealth
         
         [SerializeField] private Text moneyText = default;
         [SerializeField] private float initialMoney = default;
-        [SerializeField] private EnemySpawner[] spawners;
+        [SerializeField] private List<EnemySpawner> spawners = new List<EnemySpawner>();
         private float currentMoney;
         private float score;
         private int enemiesKilled;
@@ -26,9 +26,12 @@ namespace MoneyHealth
         // Start is called before the first frame update
         void Start()
         {
-            spawners = EnemySpawnsController.Instance.Spawners;
+            if (spawners.Count == 0)
+            {
+                Debug.LogError("[MoneyContoller] no spawners were registered.");
+            }
 
-            for (int i =0; i < spawners.Length;++i)
+            for (int i =0; i < spawners.Count;++i)
             {
                 spawners[i].OnEnemyDied += AddMoney;
             }

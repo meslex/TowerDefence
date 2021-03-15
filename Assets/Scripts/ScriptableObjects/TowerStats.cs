@@ -16,11 +16,12 @@ public class TowerLevelUp
     public float towerPrice;
 }
 
-[CreateAssetMenu(menuName = "Stats/TowerStats")]
+[CreateAssetMenu(menuName = "TowerStats")]
 public class TowerStats : ScriptableObject
 {
     #region Fields
     [SerializeField] protected string towerName;
+    [SerializeField] protected string towerTag;
 
     [SerializeField] protected float initialRange;
     [SerializeField] protected float initialAttackSpeed;
@@ -37,6 +38,7 @@ public class TowerStats : ScriptableObject
 
     #region Initial values properties
     public string TowerName { get { return towerName; } }
+    public string TowerTag { get { return towerTag; } }
 
     public float InitialRange { get { return initialRange; } }
     public float InitialAttackSpeed { get { return initialAttackSpeed; } }

@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
 
-public class GroundEnemy : BaseEnemy
+public class GroundEnemy : Enemy
 {
     [SerializeField] protected Color skinColor;
 

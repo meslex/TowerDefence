@@ -10,24 +10,12 @@ public class ObjectPoolItem
     public bool shouldExpand = true;
 
     [HideInInspector]
-    public Stack<GameObject> pooledObjects = new Stack<GameObject>();
-
-    public ObjectPoolItem() { }
-
-    public ObjectPoolItem(GameObject objectToPool, int amountToPool, bool shouldExpand = true)
-    {
-        this.objectToPool = objectToPool;
-        this.amountToPool = amountToPool;
-        this.shouldExpand = shouldExpand;
-    }
+    public List<GameObject> pooledObjects = new List<GameObject>();
 }
 
-/// <summary>
-/// Uses simple list inside
-/// </summary>
-public class ObjectPooler : Singlenton<ObjectPooler>, IObjectPooler
+public class ObjectPooler : Singlenton<ObjectPooler>
 {
-
+    //public List<GameObject> pooledObjects;
     public List<ObjectPoolItem> itemsToPool;
 
     private void Start()
@@ -40,28 +28,16 @@ public class ObjectPooler : Singlenton<ObjectPooler>, IObjectPooler
                 GameObject obj = (GameObject)Instantiate(item.objectToPool);
                 obj.transform.SetParent(transform, false);
                 obj.SetActive(false);
-                item.pooledObjects.Push(obj);
+                item.pooledObjects.Add(obj);
             }
         }
     }
 
     /// <summary>
-    /// Returns Object to pool, so it can be pooled again
+    /// Returns Pooled Object based on gameObject
     /// </summary>
     /// <param name="objectToPool"></param>
-    public void ReturnObjectToPool(GameObject objectToPool)
-    {
-        for (int c = 0; c < itemsToPool.Count; ++c)
-        {
-            if (itemsToPool[c].objectToPool.tag == objectToPool.tag)
-            {
-                itemsToPool[c].pooledObjects.Push(objectToPool);
-                
-            }
-
-        }
-    }
-
+    /// <returns></returns>
     public GameObject GetPooledObject(GameObject objectToPool)
     {
         GameObject result;
@@ -70,10 +46,47 @@ public class ObjectPooler : Singlenton<ObjectPooler>, IObjectPooler
         {
             if (itemsToPool[c].objectToPool.tag == objectToPool.tag)
             {
+                if(itemsToPool[c].pooledObjects.Count > 0)
+                {
+                    result = itemsToPool[c].pooledObjects[0];
+
+                    itemsToPool[c].pooledObjects.RemoveAt(0);
+                    return result;
+                }
+
+                if (itemsToPool[c].shouldExpand)
+                {
+                    GameObject obj = (GameObject)Instantiate(objectToPool);
+                    obj.transform.SetParent(transform, false);
+                    obj.SetActive(false);
+                    return obj;
+
+                }
+            }
+
+        }
+        return null;
+    }
+
+
+    /// <summary>
+    /// Returns Pooled Object based on its tag
+    /// </summary>
+    /// <param name="tag"></param>
+    /// <returns></returns>
+    public GameObject GetPooledObject(string tag)
+    {
+        GameObject result;
+
+        for (int c = 0; c < itemsToPool.Count; ++c)
+        {
+            if (itemsToPool[c].objectToPool.tag == tag)
+            {
                 if (itemsToPool[c].pooledObjects.Count > 0)
                 {
-                    result = itemsToPool[c].pooledObjects.Pop();
+                    result = itemsToPool[c].pooledObjects[0];
 
+                    itemsToPool[c].pooledObjects.RemoveAt(0);
                     return result;
                 }
 
@@ -86,14 +99,25 @@ public class ObjectPooler : Singlenton<ObjectPooler>, IObjectPooler
 
                 }
             }
-        }
 
-        itemsToPool.Add(new ObjectPoolItem(objectToPool, 1));
-        result = (GameObject)Instantiate(itemsToPool[itemsToPool.Count - 1].objectToPool);
-        result.transform.SetParent(transform, false);
-        result.SetActive(false);
-        return result;
+        }
+        return null;
     }
 
+    /// <summary>
+    /// Returns Object to pool, so it can be pooled again
+    /// </summary>
+    /// <param name="objectToPool"></param>
+    public void ReturnObjectToPool(GameObject objectToPool)
+    {
+        for (int c = 0; c < itemsToPool.Count; ++c)
+        {
+            if (itemsToPool[c].objectToPool.tag == objectToPool.tag)
+            {
+                itemsToPool[c].pooledObjects.Add(objectToPool);
+                
+            }
 
+        }
+    }
 }

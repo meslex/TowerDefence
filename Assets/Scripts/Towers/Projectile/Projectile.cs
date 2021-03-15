@@ -13,71 +13,63 @@ namespace Towers.Projectiles
     /// <summary>
     /// Base class for projectiles
     /// </summary>
-    public class Projectile : BaseProjectile
+    public class Projectile : MonoBehaviour
     {
+        protected float speed;
+        protected float damage;
+        protected Enemy target;
 
+        [SerializeField] protected float lifeSpan;
         [SerializeField] protected float steeringForce;
 
         private Vector3 currentVelocity;
 
-        protected override void OnEnable()
+        private void OnEnable()
         {
             StartCoroutine(RemoveProjectile());
-            base.OnEnable();
         }
 
-        public virtual void Init(float speed, float damage, BaseEnemy target)
+        public virtual void Init(float speed, float damage, Enemy target)
         {
-            this.Speed = speed;
-            this.Damage = damage;
-            this.Target = target;
+            this.speed = speed;
+            this.damage  = damage;
+            this.target = target;
         }
 
-        protected void FixedUpdate()
+        private void Update()
         {
-            if(moving)
-                Move();
+            Move();
+        }
+
+        protected virtual void Move()
+        {
+            Vector3 desiredVelocity = (target.Position - transform.position).normalized;
+            Vector3 steering = (desiredVelocity - currentVelocity) * steeringForce;
+
+            currentVelocity += steering;
+
+            transform.position += currentVelocity.normalized * speed * Time.deltaTime;
         }
 
         protected virtual void OnTriggerEnter(Collider coll)
         {
+            Debug.Log("Projectile collision");
             Damageable dm = coll.gameObject.GetComponent<Damageable>();
             if (dm != null)
             {
-                dm.ReceiveDamage(Damage);
+                dm.ReceiveDamage(damage);
             }
-
-            col.enabled = false;
-            moving = false;
-            meshRenderer.enabled = false;
-            StartCoroutine(DelayRemoval());
+            gameObject.SetActive(false);
+            ObjectPooler.Instance.ReturnObjectToPool(gameObject);
         }
 
-        protected override void Move()
+        
+        private IEnumerator RemoveProjectile()
         {
-            if (Target != null && !Target.IsDead)
-            {
-                Vector3 desiredVelocity = (Target.Position - transform.position).normalized;
-                Vector3 steering = (desiredVelocity - currentVelocity) * steeringForce;
+            yield return new WaitForSeconds(lifeSpan);
 
-                currentVelocity += steering;
-
-                transform.position += currentVelocity.normalized * Speed * Time.deltaTime;
-            }
-            else
-            {
-                transform.position += transform.forward * Speed * Time.deltaTime;
-                //Debug.Log("Projectile target is dead");
-            }
-
-            // Z-kill
-            if (transform.position.y < -5f)
-            {
-                gameObject.SetActive(false);
-                ObjectPooler.Instance.ReturnObjectToPool(gameObject);
-            }
-
-
+            gameObject.SetActive(false);
+            ObjectPooler.Instance.ReturnObjectToPool(gameObject);
         }
     }
 }

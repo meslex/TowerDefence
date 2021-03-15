@@ -62,7 +62,9 @@ public class TowerRangeController : Singlenton<TowerRangeController>
 
     IEnumerator ChangeSize(Vector3 targetScale)
     {
-        for(float diff = Mathf.Abs(transform.localScale.x - targetScale.x); diff > precision; diff = Mathf.Abs(transform.localScale.x - targetScale.x))
+        float diff = Mathf.Abs(transform.localScale.x - targetScale.x);
+
+        while ( diff > precision)
         {
             transform.localScale = Vector3.SmoothDamp(transform.localScale, targetScale, ref velocity, smoothTime);
             yield return new WaitForEndOfFrame();

@@ -16,7 +16,7 @@ namespace MoneyHealth
 
         [SerializeField] private int initialHealth = default;
         [SerializeField] private Text HealthText = default;
-        [SerializeField] private EnemySpawner[] spawners;
+        [SerializeField] private List<EnemySpawner> spawners = new List<EnemySpawner>();
 
         private int currentHealth;
 
@@ -26,9 +26,12 @@ namespace MoneyHealth
         {
             currentHealth = initialHealth;
 
-            spawners = EnemySpawnsController.Instance.Spawners;
+            if (spawners.Count == 0)
+            {
+                Debug.LogError("[HealthController] no spawners were registered.");
+            }
 
-            for (int i = 0; i < spawners.Length; ++i)
+            for (int i = 0; i < spawners.Count; ++i)
             {
                 spawners[i].OnEnemyReached += RemoveHealth;
             }
@@ -45,14 +48,13 @@ namespace MoneyHealth
         public void RemoveHealth()
         {
             currentHealth--;
-            //ShowHealth();
+            ShowHealth();
             if (currentHealth <= 0)
             {
-                currentHealth = 0; 
-                ShowHealth();
+                currentHealth = 0;
                 GameOver?.Invoke();
             }
-            ShowHealth();
+
         }
 
         private void ShowHealth()
